@@ -21,6 +21,13 @@ z = (1.0+0.0j)*np.ones(time.shape) # initial conditions
 # human data (Zamm et al. 2018)
 sprs = get_zamm_etal_2018_data()
 
+sprs = np.array(sprs)
+averages = np.mean(sprs,0)
+plt.bar(range(5),averages)
+plt.savefig('../figures_raw/fig2.eps', format='eps')
+print(sprs.shape)
+input()
+
 mean_slope = 0
 spr_cv = 0
 slopes = []
