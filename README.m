@@ -1,1 +1,1 @@
-# Adaptive Synchronization with Hebbian Learning and Elasticity #
+Adaptive Synchronization with Hebbian Learning and Elasticity
