@@ -1,6 +1,6 @@
 def get_zamm_etal_2018_data():
 
-    sprs = [[320],
+    data = [[320],
             [350],
             [355],
             [359],
@@ -50,10 +50,10 @@ def get_zamm_etal_2018_data():
                 [-210, -120, 70,   120],
                 [-435, -320, 320,  705]]
     
-    for ispr, spr in enumerate(sprs):
+    for ispr, spr in enumerate(data):
             spr.extend([spr[0] + sprdiff for sprdiff in sprdiffs[ispr]])
 
-    return sprs
+    return data
 
 
 
