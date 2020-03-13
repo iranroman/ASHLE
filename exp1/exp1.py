@@ -23,11 +23,6 @@ sprs = get_zamm_etal_2018_data()
 
 sprs = np.array(sprs)
 averages = np.mean(sprs,0)
-plt.bar(range(4),averages[1:],yerr=np.std(sprs[:,1:],0)/np.sqrt(sprs.shape[0]))
-plt.ylim([0,1000])
-plt.savefig('../figures_raw/fig2.eps', format='eps')
-print(sprs.shape)
-input()
 
 mean_slope = 0
 spr_cv = 0
@@ -76,3 +71,6 @@ plt.subplot(1,2,2)
 plt.bar(range(4),slopes)
 plt.show()
 
+plt.bar(range(4),averages[1:],yerr=np.std(sprs[:,1:],0)/np.sqrt(sprs.shape[0]))
+plt.ylim([0,1000])
+plt.savefig('../figures_raw/fig2.eps', format='eps')
