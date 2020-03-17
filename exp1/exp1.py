@@ -7,19 +7,20 @@ from human_data import get_zamm_etal_2018_data
 # time parameters
 fs = 500
 T = 1/fs
-dur = 25
+dur = 50
 time = np.arange(0,dur,T)
 
 # oscillator parameters
 a = 1
 b = -1
-l1 = 5 # learning rate
-l2 = 0.0025 # elasticity
+l1 = 5.0 # learning rate
+l2 = 0.001 # elasticity
 nlearn = 8 # number of metronome learning beats
 z = (1.0+0.0j)*np.ones(time.shape) # initial conditions
 
 # human data (Zamm et al. 2018)
 subjs_data = get_zamm_etal_2018_data()
+#subjs_data = [[450, 250, 350, 600, 800]]
 allslopes = []
 for subj_data in subjs_data:
 
@@ -39,8 +40,7 @@ for subj_data in subjs_data:
 
         for n, t in enumerate(time[:-1]):
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + x[n])
-            f[n+1] = f[n] + T*(-np.power(np.abs(f[n]-f0),2)*l1*np.real(x[n])*np.sin(np.angle(z[n])) - l2*np.power(np.abs(spf-f[n]),2)*(f[n]-spf)/spf)
-
+            f[n+1] = f[n] + T*(-np.power(np.abs(f[n]-f0),2)*l1*np.real(x[n])*np.sin(np.angle(z[n])) + l2*np.power(np.abs((f[n])-(spf)),4)*(spf-f[n])/spf)
 
         #plt.plot(time,np.real(z))
         #plt.plot(time,np.real(x))
