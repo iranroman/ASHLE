@@ -14,7 +14,7 @@ time = np.arange(0,dur,T)
 a = 1
 b = -1
 l1 = 5.0 # learning rate
-l2 = 0.001 # elasticity
+l2 = 0.0000175 # elasticity
 nlearn = 8 # number of metronome learning beats
 z = (1.0+0.0j)*np.ones(time.shape) # initial conditions
 
@@ -40,7 +40,7 @@ for subj_data in subjs_data:
 
         for n, t in enumerate(time[:-1]):
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + x[n])
-            f[n+1] = f[n] + T*(-np.power(np.abs(f[n]-f0),2)*l1*np.real(x[n])*np.sin(np.angle(z[n])) + l2*np.power(np.abs((f[n])-(spf)),4)*(spf-f[n])/spf)
+            f[n+1] = f[n] + T*(-np.power(np.abs(f[n]-f0),2)*l1*np.real(x[n])*np.sin(np.angle(z[n])) - l2*(-np.power(spf,4)+np.power(f[n],4)))#np.power(np.abs((spf)-(f[n])),2)*(spf-f[n])/spf)
 
         #plt.plot(time,np.real(z))
         #plt.plot(time,np.real(x))
@@ -75,16 +75,16 @@ SE_slopes = np.std(allslopes,0)/np.sqrt(allslopes.shape[0])
 plt.subplot(2,2,1)
 plt.bar(np.arange(4),[0.07,0.03,-0.025,-0.19],yerr=[0.015,0.015,0.02,0.02])
 plt.grid()
-plt.ylim([-0.5, 0.15])
+plt.ylim([-0.3, 0.15])
 plt.subplot(2,2,2)
 plt.bar(np.arange(4),mean_slopes,yerr=SE_slopes)
 plt.grid()
-plt.ylim([-0.5, 0.15])
+plt.ylim([-0.3, 0.15])
 plt.subplot(2,2,4)
 plt.scatter(np.ones(allslopes.shape[0]),allslopes[:,0])
 plt.scatter(2*np.ones(allslopes.shape[0]),allslopes[:,1])
 plt.scatter(3*np.ones(allslopes.shape[0]),allslopes[:,2])
 plt.scatter(4*np.ones(allslopes.shape[0]),allslopes[:,3])
 plt.grid()
-plt.ylim([-1.15, 0.5])
+plt.ylim([-1.25, 0.5])
 plt.savefig('../figures_raw/fig2.eps')
