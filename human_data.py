@@ -1,4 +1,4 @@
-def get_zamm_etal_2018_data():
+def get_zamm_etal_2018_data_and_result():
 
     data = [[320],
             [350],
@@ -53,11 +53,14 @@ def get_zamm_etal_2018_data():
     for ispr, spr in enumerate(data):
             spr.extend([spr[0] + sprdiff for sprdiff in sprdiffs[ispr]])
 
-    return data
+    result = [[0.075, 0.03, -0.02, -0.195], 
+		[0.015, 0.015, 0.02, 0.03]]
+
+    return {'data': data, 'result': result}
 
 
 
-def get_scheurich_etal_2018_data():
+def get_scheurich_etal_2018_data_and_result():
 
     musicians = [250, 260, 300, 310, 
                  325, 340, 345, 350, 
@@ -75,7 +78,7 @@ def get_scheurich_etal_2018_data():
 
 
 
-def get_zamm_etal_2016_data():
+def get_zamm_etal_2016_data_and_result():
 
     IOI_match1 = [269, 280, 350, 343, 373, 
                   376, 398, 420, 433, 451]
