@@ -13,16 +13,24 @@ dur = 50
 time = np.arange(0,dur,T)
 
 # oscillator parameters
+a_d = -1
+b_d = 4
+b2_d = -0.25
+F_d = 1.5
 a = 1
 b = -1
-l1 = 2.5 # learning rate
-l2 = 0.000019 # elasticity
+l1 = 0.75 # learning rate
+l2 = 0.04 # 0.00019 # elasticity
+l2_d = l2 # 0.00019 # elasticity
+base=2
 nlearn = 8 # number of metronome learning beats
 z = (1.0+0.0j)*np.ones(time.shape) # initial conditions
+d = (0.0+0.0j)*np.ones(time.shape) # initial conditions
 
 # human data and results (Zamm et al. 2018)
 zamm_etal_2018 = get_zamm_etal_2018_data_and_result()
 subjs_data = zamm_etal_2018['data']
+#subjs_data = [[420, 250, 350, 600, 800]]
 result = zamm_etal_2018['result']
 
 # simulations
@@ -42,15 +50,30 @@ for subj_data in subjs_data:
         x = np.exp(1j*2*np.pi*time*f0)
         x[int(nlearn*fs/f0):] = 0
         f = (spf+0.01*np.random.randn())*np.ones(time.shape)
+        f_d = (spf+0.01*np.random.randn())*np.ones(time.shape)
 
         for n, t in enumerate(time[:-1]):
-            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + x[n])
-            f[n+1] = f[n] + T*(-f[n]*l1*np.real(x[n])*np.sin(np.angle(z[n])) - l2*(np.power(f[n],4)-np.power(spf,4)))
+            d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))) + F_d*x[n])
+            f_d[n+1] = f_d[n] + T*(-f_d[n]*l1*np.real(F_d*x[n])*np.sin(np.angle(d[n])) - l2_d*(np.power(base,f_d[n])-np.power(base,f[n]))/base)
+            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + d[n])
+            f[n+1] = f[n] + T*(-f[n]*l1*np.real(d[n])*np.sin(np.angle(z[n])) - l2*(np.power(base,f[n]) - np.power(base,spf))/base)
 
+        #plt.subplot(2,1,1)
+        #plt.plot(np.real(z[:14000]))
+        #plt.plot(np.real(x[:14000]))
+        #plt.plot(1/f[:14000])
+        #plt.grid()
+        #plt.subplot(2,1,2)
+        #plt.plot(np.real(d[:14000]))
+        #plt.plot(np.real(x[:14000]))
+        #plt.plot(1/f_d[:14000])
+        #plt.grid()
+        #plt.show()
         print('###############################')
         print('stimulus IOI (Hz): ', 1000/f0)
-        print('learned IOI (ms): ', 1000/f[int(nlearn*fs/f0)])
+        print('learned IOI (ms): ', 1000/f[int((nlearn+10)*fs/f0)])
         peaks, _ = find_peaks(np.real(z[int((nlearn+1.5)*fs/f0):]))
+        peaks = peaks[10:]
         peaks = 1000*peaks/fs # converting to miliseconds
         slope, _, _, _, _ = linregress(range(len(np.diff(peaks))), np.diff(peaks))
         cv = np.std(np.diff(peaks))/np.mean(np.diff(peaks))
