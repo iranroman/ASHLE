@@ -73,7 +73,7 @@ for subj_data in subjs_data:
         print('stimulus IOI (Hz): ', 1000/f0)
         print('learned IOI (ms): ', 1000/f[int((nlearn+10)*fs/f0)])
         peaks, _ = find_peaks(np.real(z[int((nlearn+1.5)*fs/f0):]))
-        peaks = peaks[10:]
+        peaks = peaks[0:]
         peaks = 1000*peaks/fs # converting to miliseconds
         slope, _, _, _, _ = linregress(range(len(np.diff(peaks))), np.diff(peaks))
         cv = np.std(np.diff(peaks))/np.mean(np.diff(peaks))

@@ -20,7 +20,7 @@ b2_d = -0.25
 F_d = 1.5
 a  = 1
 b  = -1
-l1 = 0.75 # learning rate
+l1 = 0.69 # learning rate
 l2 = 0.04 # elasticity
 l2_d = l2
 base = 2
@@ -37,6 +37,7 @@ for ispr, spr in enumerate(musicians):
     print(spr) 
     # generate period lengths ms 30% faster 15% ... to a given SPR
     stim_freqs = np.linspace(0.7, 1.30, 5) * spr   # Metronome's period length in milliseconds
+    stim_freqs = np.linspace(0.6, 1.4, 5) * spr   # Metronome's period length in milliseconds
     stim_freqs = np.delete(stim_freqs, 2, axis=0)  # remove central element
     mean_asyn_freqs = np.zeros(stim_freqs.shape)
     
