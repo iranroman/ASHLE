@@ -1,0 +1,126 @@
+import sys
+sys.path.append("..")
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.signal import find_peaks
+from scipy.stats import linregress
+
+# time parameters
+fs = 1000
+T = 1/fs
+dur = 50
+time = np.arange(0,dur,T)
+
+# oscillator parameters
+a_m = -0.5
+b_1m = 2.5
+b_2m = -2.13
+a_b = 1
+b_1b = -1
+f_0 = 1
+l1 = 0.75 # learning rate
+l2 = 0.04 # 0.00019 # elasticity
+base=2
+
+    
+for f_s in [1.1]:
+    x = np.exp(1j*2*np.pi*time*f_s)
+    z_m = (0+0.0j)*np.ones(time.shape) # initial conditions
+    f_m = np.ones(time.shape) # initial conditions
+    z_b = (0+0.0j)*np.ones(time.shape) # initial conditions
+    f_b = np.ones(time.shape) # initial conditions
+    for n, t in enumerate(time[:-1]):
+        
+        z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2) + b_2m*np.power(np.abs(z_m[n]),4)/(1 - np.power(np.abs(z_m[n]),2))) + x[n])
+        f_m[n+1] = f_m[n] + T*(-f_m[n]*l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - l2*(np.power(base,f_m[n]) - np.power(base,f_b[n]))/base)
+        z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
+        f_b[n+1] = f_b[n] + T*(-f_b[n]*l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,f_b[n]) - np.power(base,f_0))/base)
+
+plt.plot(np.real(np.exp(1j*np.angle(z_b))))
+plt.plot(np.real(x))
+plt.plot(f_b)
+plt.show()
+
+input()
+
+# human data and results (Zamm et al. 2018)
+zamm_etal_2018 = get_zamm_etal_2018_data_and_result()
+subjs_data = zamm_etal_2018['data']
+#subjs_data = [[420, 250, 350, 600, 800]]
+result = zamm_etal_2018['result']
+
+# simulations
+allslopes = []
+for subj_data in subjs_data:
+
+    spr = subj_data[0]
+    spf  = 1000/spr
+
+    mean_slope = 0
+    spr_cv = 0
+    slopes = []
+    cvs = []
+    for pr in subj_data:
+
+        f0 = 1000/pr
+        x = np.exp(1j*2*np.pi*time*f0)
+        x[int(nlearn*fs/f0):] = 0
+        f = (spf+0.01*np.random.randn())*np.ones(time.shape)
+        f_d = (spf+0.01*np.random.randn())*np.ones(time.shape)
+
+        for n, t in enumerate(time[:-1]):
+            d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))) + F_d*x[n])
+            f_d[n+1] = f_d[n] + T*(-f_d[n]*l1*np.real(F_d*x[n])*np.sin(np.angle(d[n])) - l2_d*(np.power(base,f_d[n])-np.power(base,f[n]))/base)
+            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + d[n])
+            f[n+1] = f[n] + T*(-f[n]*l1*np.real(d[n])*np.sin(np.angle(z[n])) - l2*(np.power(base,f[n]) - np.power(base,spf))/base)
+
+        #plt.subplot(2,1,1)
+        #plt.plot(np.real(z[:14000]))
+        #plt.plot(np.real(x[:14000]))
+        #plt.plot(1/f[:14000])
+        #plt.grid()
+        #plt.subplot(2,1,2)
+        #plt.plot(np.real(d[:14000]))
+        #plt.plot(np.real(x[:14000]))
+        #plt.plot(1/f_d[:14000])
+        #plt.grid()
+        #plt.show()
+        print('###############################')
+        print('stimulus IOI (Hz): ', 1000/f0)
+        print('learned IOI (ms): ', 1000/f[int((nlearn+10)*fs/f0)])
+        peaks, _ = find_peaks(np.real(z[int((nlearn+1.5)*fs/f0):]))
+        peaks = peaks[0:]
+        peaks = 1000*peaks/fs # converting to miliseconds
+        slope, _, _, _, _ = linregress(range(len(np.diff(peaks))), np.diff(peaks))
+        cv = np.std(np.diff(peaks))/np.mean(np.diff(peaks))
+        print('Slope: ', slope - mean_slope)
+        print('CV: ', cv)
+        if pr == spr:
+            mean_slope = slope
+            spr_cv = cv
+        else:
+            slopes.append(slope-mean_slope)
+            cvs.append(cv)
+
+    allslopes.append(slopes)
+
+# analysis
+allslopes = np.asarray(allslopes)
+mean_slopes = np.mean(allslopes,0)
+SE_slopes = np.std(allslopes,0)/np.sqrt(allslopes.shape[0])
+
+# figure
+barWidth = 0.4
+barLoc = 0.2
+loc1 = np.arange(len(mean_slopes))-barLoc
+loc2 = [x + barWidth for x in loc1]
+plt.bar(loc1,result[0],yerr=result[1],width=barWidth,color='silver',capsize=5,edgecolor='black',label='Musicians')
+plt.bar(loc2,mean_slopes,yerr=SE_slopes,width=barWidth,color='lightskyblue',capsize=5,edgecolor='black',label='ASHLE')
+plt.grid()
+plt.ylim([-0.3, 0.15])
+plt.axhline(0,color='black')
+plt.xlabel('Rate Condition')
+plt.xticks(range(len(mean_slopes)),['Faster','Fast','Slow','Slower'])
+plt.ylabel('Adjusted Mean Slope of IOIs')
+plt.legend(loc='lower left')
+plt.savefig('../figures_raw/fig2.eps')
