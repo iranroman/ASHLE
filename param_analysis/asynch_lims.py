@@ -22,9 +22,9 @@ b_2m = -2.13
 a_b = 1
 b_1b = -1
 f_0 = 1
-f_stim = [1.5, 0.5] 
-l1s = [1, 2, 4, 16, 32, 64] 
-l2s = [1, 2, 4, 16, 32, 64] 
+f_stim = [1.45, 0.55] 
+l1s = range(9)
+l2s = range(9)
 base= np.exp(1)
 nlearn = 4
 
@@ -53,9 +53,9 @@ for if_s, f_s in enumerate(f_stim):
                 z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
                 f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,f_b[n]) - np.power(base,f_0))/np.power(base,f_0))
             
-            locs_z, _ = find_peaks(np.real(z_b))
-            locs_x, _ = find_peaks(np.real(x))
-    
+            locs_z, z_vals = find_peaks(np.real(z_b), height=0.85*np.amax(np.real(z_b[int(nlearn*fs/f_s):])))
+            locs_x, x_vals = find_peaks(np.real(x))
+
             # which z peak is closest to the midpoint of the simulation?
             halfsamps_locsz_diff = np.absolute(int(nlearn*fs/f_s) - locs_z)
             mid_nzpeak_index = np.argmin(halfsamps_locsz_diff) # get index of minimum @ half samp
@@ -79,9 +79,19 @@ for if_s, f_s in enumerate(f_stim):
             
             if peaks_diff == 0:
                 asynch_mat[il1,il2] = 1000*np.mean((locs_z[0:-2] - locs_x[mid_F_peaks_index:pen_F_peaks_index])/fs) 
+
+            #plt.figure(figsize=(10,5))
+            #print(asynch_mat[il1,il2],f_s,l1,l2,peaks_diff)
+            #plt.plot(np.real(z_b[:15000]))
+            #plt.stem(locs_z[locs_z<15000],np.ones((locs_z[locs_z<15000].shape)))
+            #plt.stem(locs_x[locs_x<15000],np.ones((locs_x[locs_x<15000].shape)),'k',markerfmt='ko')
+            #plt.plot(np.real(x[:15000]))
+            #plt.plot(f_b[:15000])
+            #plt.plot(range(15000),f_s*np.ones(15000))
+            #plt.show()
     
     plt.subplot(1,2,if_s+1)
-    plt.imshow(asynch_mat, vmin=-500,vmax=500)
+    plt.imshow(asynch_mat, vmin=-800,vmax=250)
     for il1, l1, in enumerate(l1s):
         for il2, l2, in enumerate(l2s):
             if not np.isnan(asynch_mat[il1,il2]):
@@ -90,5 +100,7 @@ for if_s, f_s in enumerate(f_stim):
     plt.xticks(range(len(l2s)),l2s)
     ax = plt.gca()
     plt.text(-0.1, 1.1, string.ascii_uppercase[if_s], size=20, transform=ax.transAxes, weight='bold')
+    plt.xlabel(r'$\lambda_2$')
+    plt.ylabel(r'$\lambda_1$')
 
 plt.show()
