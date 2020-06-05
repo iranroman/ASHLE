@@ -21,9 +21,9 @@ b_2m = -2.13
 a_b = 1
 b_1b = -1
 f_0 = 1
-f_stim = [1.3, 0.7] #[1.5, 1.3, 1.15, 0.85, 0.7, 0.5]
-l1s = [1, 2, 4, 16, 32] #[0.3, 0.4, 0.5, 0.6, 0.7] 
-l2s = [4, 16, 32, 64] #[0.0, 0.04, 0.05, 0.06, 0.07] 
+f_stim = [1.45, 1.3, 1.15, 0.85, 0.7, 0.55]
+l1s = [0.3, 0.4, 0.5, 0.6]
+l2s = [0.0, 0.025, 0.05] 
 base= np.exp(1)
 nlearn = 4
 
@@ -80,7 +80,7 @@ for il1, l1 in enumerate(l1s):
         ax.bar(range(len(f_stim)), bar_results)
         ax.grid(linestyle='dashed')
         ax.set_axisbelow(True)
-        ax.set_ylim([-100, 100])
+        ax.set_ylim([-25, 25])
         if il2 == 0:
             ax.set_ylabel(r'$\lambda_1 = {}$'.format(l1))
             ax.yaxis.set_major_formatter(FormatStrFormatter('%d ms'))
@@ -91,6 +91,7 @@ for il1, l1 in enumerate(l1s):
             ax.set_xticks(range(len(f_stim)))
             ax.set_xticklabels(['F50','F30','F15','S15','S30','S50'])
         else:
+            ax.set_xticks(range(len(f_stim)))
             ax.set_xticklabels([])
 
 plt.show()
