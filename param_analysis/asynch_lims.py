@@ -16,15 +16,15 @@ dur = 50
 time = np.arange(0,dur,T)
 
 # oscillator parameters
-a_m = -0.5
-b_1m = 2.5
-b_2m = -2.13
+a_m = 1
+b_1m = -1
+b_2m = 0
 a_b = 1
 b_1b = -1
-f_0 = 2.46
+f_0 = 2.5
 f_stim = [1.45*f_0, 0.55*f_0] 
-l1s = range(9)
-l2s = range(9)
+l1s = [0, 2, 4, 8, 16]
+l2s = [0, 2, 4, 8, 16]
 base= np.exp(1)
 nlearn = 4
 
@@ -49,9 +49,9 @@ for if_s, f_s in enumerate(f_stim):
             for n, t in enumerate(time[:-1]):
                 
                 z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2) + b_2m*np.power(np.abs(z_m[n]),4)/(1 - np.power(np.abs(z_m[n]),2))) + x[n])
-                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - l2*(np.power(base,f_m[n]) - np.power(base,f_b[n]))/np.power(base,f_b[n]))
+                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (l2/100)*(np.power(base,(f_m[n]-f_b[n])/base)-1))
                 z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
-                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,f_b[n]) - np.power(base,f_0))/np.power(base,f_0))
+                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/base)-1))
             
             locs_z, z_vals = find_peaks(np.real(z_b), height=0.85*np.amax(np.real(z_b[int(nlearn*fs/f_s):])))
             locs_x, x_vals = find_peaks(np.real(x))
