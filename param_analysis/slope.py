@@ -9,7 +9,7 @@ from scipy.stats import linregress
 
 
 # time parameters
-fs = 1000
+fs = 500
 T = 1/fs
 dur = 100
 time = np.arange(0,dur,T)
@@ -20,10 +20,10 @@ b_1m = -1
 b_2m = 0
 a_b = 1
 b_1b = -1
-f_0 = 2.27
-f_stim = [x*f_0 for x in [1, 1.71930111, 1.33295354, 0.76859625, 0.55374987]]
-l1s = [4] #[0.3, 0.4, 0.5, 0.6]
-l2s = [0.8] #[0.0, 0.025, 0.05] 
+f_0 = 2.28
+f_stim = [1000/(x*(1000/f_0)) for x in [1, 0.58163168, 0.7502137, 1.30107323, 1.8058695]]
+l1s = [6] #[0.3, 0.4, 0.5, 0.6]
+l2s = [2] #[0.0, 0.025, 0.05] 
 bases = [np.exp(1)]
 base_div = 1
 nlearn = 0
@@ -48,7 +48,7 @@ for base in bases:
                 for n, t in enumerate(time[:-1]):
                     
                     z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2) + b_2m*np.power(np.abs(z_m[n]),4)/(1 - np.power(np.abs(z_m[n]),2))) + x[n])
-                    f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (l2/10)*(np.power(base,(f_m[n]-f_b[n])/base)-1))
+                    f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (l2/100)*(np.power(base,(f_m[n]-f_b[n])/base)-1))
                     z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
                     f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/base)-1))
             

@@ -19,10 +19,10 @@ b2_d = 0
 F_d = 1
 a = 1
 b = -1
-l1 = 4 # learning rate
+l1 = 5 # learning rate
 l2 = 1.4 # 0.00019 # elasticity
-l2_d = l2/100 # 0.00019 # elasticity
-base=np.exp(1)
+l2_d = l2/50 # 0.00019 # elasticity
+base = np.exp(1)
 nlearn = 0 # number of metronome learning beats
 z = (1.0+0.0j)*np.ones(time.shape) # initial conditions
 d = (0.99+0.0j)*np.ones(time.shape) # initial conditions
@@ -30,7 +30,7 @@ d = (0.99+0.0j)*np.ones(time.shape) # initial conditions
 # human data and results (Zamm et al. 2018)
 zamm_etal_2018 = get_zamm_etal_2018_data_and_result()
 subjs_data = zamm_etal_2018['data']
-#subjs_data = [[440, 256, 331, 572, 800]]
+subjs_data = [[440, 256, 331, 572, 790]]
 result = zamm_etal_2018['result']
 
 # simulations
@@ -54,9 +54,9 @@ for subj_data in subjs_data:
 
         for n, t in enumerate(time[:-1]):
             d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))) + F_d*x[n])
-            f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*x[n])*np.sin(np.angle(d[n])) - l2_d*(np.power(base,(f_d[n]-f[n])/base)-1))
+            f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*x[n])*np.sin(np.angle(d[n])) - l2_d*(f_d[n]-f[n])/f[n])
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
-            f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-spf)/base)-1))
+            f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-spf)/spf)-1))
 
         #plt.subplot(2,1,1)
         #plt.plot(np.real(z[:]))

@@ -20,9 +20,9 @@ b2_d = 0
 F_d = 1
 a  = 1
 b  = -1
-l1 = 4.0 # learning rate
+l1 = 5 # learning rate
 l2 = 1.4 # elasticity
-l2_d = l2/100
+l2_d = l2/50
 base = np.exp(1)
 z  = (1.0+0.0j)*np.ones(time.shape) # initial conditions
 d = (0.99+0.0j)*np.ones(time.shape) # initial conditions
@@ -30,13 +30,14 @@ d = (0.99+0.0j)*np.ones(time.shape) # initial conditions
 # human data (Scheurich et al. 2018)
 subjs_data = get_scheurich_etal_2018_data_and_result()
 musicians = subjs_data[0] # group musicians
+musicians = [420]
 
 mean_indiv = np.zeros((len(musicians), 6)) 
 locs_z = pks_z = locs_F = pks_F  = []        # Locations @ local maxima
 for ispr, spr in enumerate(musicians):
     print(spr) 
     # generate period lengths ms 30% faster 15% ... to a given SPR
-    stim_freqs = [freq*spr for freq in [0.65, 0.7, 0.85, 1, 1.15, 1.3, 1.45]]   # Metronome's period length in milliseconds
+    stim_freqs = [freq*spr for freq in [0.55, 0.7, 0.85, 1, 1.15, 1.3, 1.45]]   # Metronome's period length in milliseconds
     stim_freqs = np.delete(stim_freqs, 3, axis=0)  # remove central element
     print(stim_freqs)
     mean_asyn_freqs = np.zeros(stim_freqs.shape)
@@ -51,9 +52,9 @@ for ispr, spr in enumerate(musicians):
         # Forward Euler integration
         for n, t in enumerate(time[:-1]):
             d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))) + F_d*F[n])
-            f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*F[n])*np.sin(np.angle(d[n])) - l2_d*(np.power(base,(f_d[n]-f[n])/base)-1))
+            f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*F[n])*np.sin(np.angle(d[n])) - l2_d*(f_d[n]-f[n])/f[n])
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
-            f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-f[0])/base)-1))
+            f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-f[0])/f[0])-1))
             
             # Find peaks a.k.a local maxima - (zero crossing)
             if (z[n+1].imag >= 0.0) and (z[n].imag <= 0.0):
