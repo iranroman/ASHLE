@@ -30,19 +30,19 @@ d = (0.99+0.0j)*np.ones(time.shape) # initial conditions
 # human data (Scheurich et al. 2018)
 subjs_data = get_scheurich_etal_2018_data_and_result()
 musicians = subjs_data[0] # group musicians
-musicians = [420]
+#musicians = [420]
 
 mean_indiv = np.zeros((len(musicians), 6)) 
 locs_z = pks_z = locs_F = pks_F  = []        # Locations @ local maxima
 for ispr, spr in enumerate(musicians):
     print(spr) 
     # generate period lengths ms 30% faster 15% ... to a given SPR
-    stim_freqs = [freq*spr for freq in [0.55, 0.7, 0.85, 1, 1.15, 1.3, 1.45]]   # Metronome's period length in milliseconds
-    stim_freqs = np.delete(stim_freqs, 3, axis=0)  # remove central element
+    stim_freqs = [freq*spr for freq in [1, 0.55, 0.7, 0.85, 1.15, 1.3, 1.45]]   # Metronome's period length in milliseconds
     print(stim_freqs)
-    mean_asyn_freqs = np.zeros(stim_freqs.shape)
+    mean_asyn_freqs = np.zeros(len(stim_freqs)-1)
     
     # iterate over stimulus frequencies
+    spr_ma = 0
     for i, freq in enumerate(stim_freqs):
         f = (1000/spr)*np.ones(time.shape)
         f_d = (1000/spr)*np.ones(time.shape)
@@ -98,10 +98,39 @@ for ispr, spr in enumerate(musicians):
 
         # compute the mean asynchrony
         mean_asynchrony = locs_z[0:-2] - locs_F[mid_F_peaks_index:pen_F_peaks_index]
-        mean_asyn_freqs[i] = 1000 * mean_asynchrony.mean(0)/fs
+        if i == 0:
+            spr_ma = 1000 * mean_asynchrony.mean(0)/fs
+            print(spr_ma)
+        else:
+            mean_asyn_freqs[i-1] = (1000 * mean_asynchrony.mean(0)/fs) - spr_ma
         
     mean_indiv[ispr,:] = mean_asyn_freqs
 
-mean_asynchronies = mean_indiv.mean(0);
-plt.bar(np.arange(len(mean_asynchronies)), mean_asynchronies)
-plt.show()
+print(mean_indiv)
+mean_asynchronies = mean_indiv.mean(0)
+error_asynchronies = mean_indiv.std(0)/np.sqrt(mean_indiv.shape[0])
+
+fig, (ax1, ax2) = plt.subplots(1,2,sharey=True,figsize=(10,5))
+ax1.bar(np.arange(4),[10.5, 7.5, -3.5, -6.5],color='grey',edgecolor='black')
+ax1.errorbar(np.arange(4),[10.5, 7.5, -3.5, -6.5],[1, 1, 1.5, 2],[0,0,0,0],'none',ecolor='black')
+ax1.set_ylim([-25, 25])
+ax2.set_xlim([-0.5, 3.5])
+ax1.set_ylabel('Mean adjusted asynchrony (ms)',fontsize=15)
+ax1.set_xticks(np.arange(4))
+ax1.set_xticklabels(['F30','F15','S15','S30'],fontsize=15)
+ax1.grid(color='gray', linestyle='dashed')
+ax1.set_axisbelow(True)
+ax1.tick_params(axis="y", labelsize=15)
+ax1.yaxis.grid(color='gray', linestyle='dashed')
+ax1.text(-0.1, 1.05, 'A', transform=ax1.transAxes, size=25, weight='bold')
+ax2.axvspan(-0.5,0.5, facecolor='#c0c2c4',alpha=0.1,zorder=0)
+ax2.axvspan(4.5,5.5, facecolor='#c0c2c4',alpha=0.1,zorder=0)
+ax2.bar(np.arange(len(mean_asynchronies)), mean_asynchronies,color='grey',edgecolor='black')
+ax2.errorbar(np.arange(len(mean_asynchronies)), mean_asynchronies, error_asynchronies,[0,0,0,0,0,0],'none',ecolor='black')
+ax2.set_ylim([-25, 25])
+ax2.set_xlim([-0.5, 5.5])
+ax2.set_axisbelow(True)
+ax2.grid(color='gray', linestyle='dashed')
+ax2.set_xticks(np.arange(6))
+ax2.set_xticklabels(['F45','F30','F15','S15','S30','S45'],fontsize=15)
+plt.savefig('../figures_raw/fig2.eps')
