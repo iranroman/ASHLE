@@ -25,7 +25,7 @@ l2 = 1.4 # elasticity
 l2_d = l2/50
 base = np.exp(1)
 z  = (1.0+0.0j)*np.ones(time.shape) # initial conditions
-d = (0.99+0.0j)*np.ones(time.shape) # initial conditions
+d = (1.0+0.0j)*np.ones(time.shape) # initial conditions
 
 # human data (Scheurich et al. 2018)
 subjs_data = get_scheurich_etal_2018_data_and_result()
@@ -51,7 +51,7 @@ for ispr, spr in enumerate(musicians):
         
         # Forward Euler integration
         for n, t in enumerate(time[:-1]):
-            d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))) + F_d*F[n])
+            d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2))) + F_d*F[n])
             f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*F[n])*np.sin(np.angle(d[n])) - l2_d*(f_d[n]-f[n])/f[n])
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
             f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-f[0])/f[0])-1))
