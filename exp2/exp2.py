@@ -52,7 +52,7 @@ for ispr, spr in enumerate(musicians):
         # Forward Euler integration
         for n, t in enumerate(time[:-1]):
             d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2))) + F_d*F[n])
-            f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*F[n])*np.sin(np.angle(d[n])) - l2_d*(f_d[n]-f[n])/f[n])
+            f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*F[n])*np.sin(np.angle(d[n])) - (l1/((f[0])*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
             f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-f[0])/f[0])-1))
             
@@ -133,5 +133,5 @@ ax2.set_axisbelow(True)
 ax2.grid(color='gray', linestyle='dashed')
 ax2.set_xticks(np.arange(6))
 ax2.set_xticklabels(['F45','F30','F15','S15','S30','S45'],fontsize=15)
-ax2.text(-0.1, 1.05, 'B', transform=ax1.transAxes, size=25, weight='bold')
+ax2.text(-0.1, 1.05, 'B', transform=ax2.transAxes, size=25, weight='bold')
 plt.savefig('../figures_raw/fig2.eps')

@@ -55,7 +55,7 @@ for subj_data in subjs_data:
 
         for n, t in enumerate(time[:-1]):
             d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))))
-            f_d[n+1] = f_d[n] + T*f_d[n]*(-(l1/((spf)*2000))*np.real(F_d*z[n])*np.sin(np.angle(d[n])))
+            f_d[n+1] = f_d[n] + T*f_d[n]*(-(l1/((spf)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
             f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-spf)/spf)-1))
 
@@ -97,7 +97,7 @@ SE_slopes = np.std(allslopes,0)/np.sqrt(allslopes.shape[0])
 fig, (ax1, ax2, ax3) = plt.subplots(1,3,sharey=True,figsize=(15,5))
 ax1.bar(np.arange(4),result[0],color='grey',edgecolor='black')
 ax1.errorbar(np.arange(4),result[0],result[1],[0,0,0,0],'none',ecolor='black')
-ax1.set_ylim([-0.3, 0.15])
+ax1.set_ylim([-0.3, 0.2])
 ax2.set_xlim([-0.5, 3.5])
 ax1.set_ylabel('Mean adjusted slope of IOIs',fontsize=15)
 ax1.set_xticks(np.arange(4))
@@ -109,7 +109,7 @@ ax1.yaxis.grid(color='gray', linestyle='dashed')
 ax1.text(-0.1, 1.05, 'A', transform=ax1.transAxes, size=25, weight='bold')
 ax2.bar(np.arange(len(mean_slopes)), mean_slopes,color='grey',edgecolor='black')
 ax2.errorbar(np.arange(len(mean_slopes)), mean_slopes, SE_slopes,[0,0,0,0],'none',ecolor='black')
-ax2.set_ylim([-0.3, 0.15])
+ax2.set_ylim([-0.3, 0.2])
 ax2.set_xlim([-0.5, 3.5])
 ax2.set_axisbelow(True)
 ax2.grid(color='gray', linestyle='dashed')
@@ -143,7 +143,7 @@ for subj_data in subjs_data:
 
         for n, t in enumerate(time[:-1]):
             d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))))
-            f_d[n+1] = f_d[n] + T*f_d[n]*(-(l1/(1/(spf)*3000))*np.real(F_d*z[n])*np.sin(np.angle(d[n])))
+            f_d[n+1] = f_d[n] + T*f_d[n]*(-(l1/((spf)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
             f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-spf)/spf)-1))
 
@@ -181,7 +181,7 @@ allslopes = np.asarray(allslopes)
 for i in range(len(subjs_data)):
     ax3.plot(range(6),allslopes[i],'-o',linewidth=3,markersize=6,label=str(int(subjs_data[i]))+'ms')
 ax3.legend(loc='lower left',prop={'size': 13})
-ax3.set_ylim([-0.3, 0.15])
+ax3.set_ylim([-0.3, 0.2])
 ax3.set_xlim([-0.5, 5.5])
 ax3.set_axisbelow(True)
 ax3.grid(color='gray', linestyle='dashed')

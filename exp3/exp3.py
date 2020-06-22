@@ -67,22 +67,22 @@ for i in range(0, freqs_miss1.size):
     for n in range(ntime-1):
         if t[n] <= tr_time:
             dz[n+1] = dz[n] + T*f_d1[n]*(dz[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dz[n]),2)) + b2_d*np.power(np.abs(dz[n]),4)/(1-np.power(np.abs(dz[n]),2))) + F[n])
-            f_d1[n+1] = f_d1[n] + T*f_d1[n]*(-l1*np.real(F[n])*np.sin(np.angle(dz[n])) - l2_d*(f_d1[n]-f_1[n])/f_1[n])
+            f_d1[n+1] = f_d1[n] + T*f_d1[n]*(-l1*np.real(F[n])*np.sin(np.angle(dz[n])) - (l1/((f_1_0)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(dz[n])))
             z[n+1] = z[n] + T*f_1[n]*(z[n]*(a + 1j*2*pi + b*(abs(z[n])**2)) + np.exp(1j*np.angle(dz[n])))
             f_1[n+1] = f_1[n] + T*f_1[n]*(-l1*np.cos(np.angle(dz[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f_1[n]-f_1_0)/f_1_0)-1))
 
             dy[n+1] = dy[n] + T*f_d2[n]*(dy[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dy[n]),2)) + b2_d*np.power(np.abs(dy[n]),4)/(1-np.power(np.abs(dy[n]),2))) + F[n])
-            f_d2[n+1] = f_d2[n] + T*f_d2[n]*(-l1*np.real(F[n])*np.sin(np.angle(dy[n])) - l2_d*(f_d2[n]-f_2[n])/f_2[n])
+            f_d2[n+1] = f_d2[n] + T*f_d2[n]*(-l1*np.real(F[n])*np.sin(np.angle(dy[n])) - (l1/((f_2_0)*600))*np.cos(np.angle(y[n]))*np.sin(np.angle(dy[n])))
             y[n+1] = y[n] + T*f_2[n]*(y[n]*(a + 1j*2*pi + b*(abs(y[n])**2)) + np.exp(1j*np.angle(dy[n])))
             f_2[n+1] = f_2[n] + T*f_2[n]*(-l1*np.cos(np.angle(dy[n]))*np.sin(np.angle(y[n])) - l2*(np.power(base,(f_2[n]-f_2_0)/f_2_0)-1))
         else:
             dz[n+1] = dz[n] + T*f_d1[n]*(dz[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dz[n]),2)) + b2_d*np.power(np.abs(dz[n]),4)/(1-np.power(np.abs(dz[n]),2))) + F_d*y[n])
-            f_d1[n+1] = f_d1[n] + T*f_d1[n]*(-l1*np.real(F_d*y[n])*np.sin(np.angle(dz[n])) - l2_d*(f_d1[n]-f_1[n])/f_1[n])
+            f_d1[n+1] = f_d1[n] + T*f_d1[n]*(-l1*np.real(F_d*y[n])*np.sin(np.angle(dz[n])) - (l1/((f_1_0)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(dz[n])))
             z[n+1] = z[n] + T*f_1[n]*(z[n]*(a + 1j*2*pi + b*(abs(z[n])**2)) + np.exp(1j*np.angle(dz[n])))
             f_1[n+1] = f_1[n] + T*f_1[n]*(-l1*np.cos(np.angle(dz[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f_1[n]-f_1_0)/f_1_0)-1))
 
             dy[n+1] = dy[n] + T*f_d2[n]*(dy[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dy[n]),2)) + b2_d*np.power(np.abs(dy[n]),4)/(1-np.power(np.abs(dy[n]),2))) + F_d*z[n])
-            f_d2[n+1] = f_d2[n] + T*f_d2[n]*(-l1*np.real(F_d*z[n])*np.sin(np.angle(dy[n])) - l2_d*(f_d2[n]-f_2[n])/f_2[n])
+            f_d2[n+1] = f_d2[n] + T*f_d2[n]*(-l1*np.real(F_d*z[n])*np.sin(np.angle(dy[n])) - (l1/((f_2_0)*600))*np.cos(np.angle(y[n]))*np.sin(np.angle(dy[n])))
             y[n+1] = y[n] + T*f_2[n]*(y[n]*(a + 1j*2*pi + b*(abs(y[n])**2)) + np.exp(1j*np.angle(dy[n])))
             f_2[n+1] = f_2[n] + T*f_2[n]*(-l1*np.cos(np.angle(dy[n]))*np.sin(np.angle(y[n])) - l2*(np.power(base,(f_2[n]-f_2_0)/f_2_0)-1))
             #dz[n+1] = dz[n] + T*f_d1[n]*(dz[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dz[n]),2)) + b2_d*np.power(np.abs(dz[n]),4)/(1-np.power(np.abs(dz[n]),2))) + y[n])
@@ -138,22 +138,22 @@ for i in range(0, freqs_miss1.size):
     for n in range(ntime-1):
         if t[n] <= tr_time:
             dz[n+1] = dz[n] + T*f_d1[n]*(dz[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dz[n]),2)) + b2_d*np.power(np.abs(dz[n]),4)/(1-np.power(np.abs(dz[n]),2))) + F[n])
-            f_d1[n+1] = f_d1[n] + T*f_d1[n]*(-l1*np.real(F[n])*np.sin(np.angle(dz[n])) - l2_d*(f_d1[n]-f_1[n])/f_1[n])
+            f_d1[n+1] = f_d1[n] + T*f_d1[n]*(-l1*np.real(F[n])*np.sin(np.angle(dz[n])) - (l1/((f_1_0)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(dz[n])))
             z[n+1] = z[n] + T*f_1[n]*(z[n]*(a + 1j*2*pi + b*(abs(z[n])**2)) + np.exp(1j*np.angle(dz[n])))
             f_1[n+1] = f_1[n] + T*f_1[n]*(-l1*np.cos(np.angle(dz[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f_1[n]-f_1_0)/f_1_0)-1))
 
             dy[n+1] = dy[n] + T*f_d2[n]*(dy[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dy[n]),2)) + b2_d*np.power(np.abs(dy[n]),4)/(1-np.power(np.abs(dy[n]),2))) + F[n])
-            f_d2[n+1] = f_d2[n] + T*f_d2[n]*(-l1*np.real(F[n])*np.sin(np.angle(dy[n])) - l2_d*(f_d2[n]-f_2[n])/f_2[n])
+            f_d2[n+1] = f_d2[n] + T*f_d2[n]*(-l1*np.real(F[n])*np.sin(np.angle(dy[n])) - (l1/((f_2_0)*600))*np.cos(np.angle(y[n]))*np.sin(np.angle(dy[n])))
             y[n+1] = y[n] + T*f_2[n]*(y[n]*(a + 1j*2*pi + b*(abs(y[n])**2)) + np.exp(1j*np.angle(dy[n])))
             f_2[n+1] = f_2[n] + T*f_2[n]*(-l1*np.cos(np.angle(dy[n]))*np.sin(np.angle(y[n])) - l2*(np.power(base,(f_2[n]-f_2_0)/f_2_0)-1))
         else:
             dz[n+1] = dz[n] + T*f_d1[n]*(dz[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dz[n]),2)) + b2_d*np.power(np.abs(dz[n]),4)/(1-np.power(np.abs(dz[n]),2))) + F_d*y[n])
-            f_d1[n+1] = f_d1[n] + T*f_d1[n]*(-l1*np.real(F_d*y[n])*np.sin(np.angle(dz[n])) - l2_d*(f_d1[n]-f_1[n])/f_1[n])
+            f_d1[n+1] = f_d1[n] + T*f_d1[n]*(-l1*np.real(F_d*y[n])*np.sin(np.angle(dz[n])) - (l1/((f_1_0)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(dz[n])))
             z[n+1] = z[n] + T*f_1[n]*(z[n]*(a + 1j*2*pi + b*(abs(z[n])**2)) + np.exp(1j*np.angle(dz[n])))
             f_1[n+1] = f_1[n] + T*f_1[n]*(-l1*np.cos(np.angle(dz[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f_1[n]-f_1_0)/f_1_0)-1))
 
             dy[n+1] = dy[n] + T*f_d2[n]*(dy[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(dy[n]),2)) + b2_d*np.power(np.abs(dy[n]),4)/(1-np.power(np.abs(dy[n]),2))) + F_d*z[n])
-            f_d2[n+1] = f_d2[n] + T*f_d2[n]*(-l1*np.real(F_d*z[n])*np.sin(np.angle(dy[n])) - l2_d*(f_d2[n]-f_2[n])/f_2[n])
+            f_d2[n+1] = f_d2[n] + T*f_d2[n]*(-l1*np.real(F_d*z[n])*np.sin(np.angle(dy[n])) - (l1/((f_2_0)*600))*np.cos(np.angle(y[n]))*np.sin(np.angle(dy[n])))
             y[n+1] = y[n] + T*f_2[n]*(y[n]*(a + 1j*2*pi + b*(abs(y[n])**2)) + np.exp(1j*np.angle(dy[n])))
             f_2[n+1] = f_2[n] + T*f_2[n]*(-l1*np.cos(np.angle(dy[n]))*np.sin(np.angle(y[n])) - l2*(np.power(base,(f_2[n]-f_2_0)/f_2_0)-1))
 
