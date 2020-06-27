@@ -29,7 +29,7 @@ d = (1.0+0.0j)*np.ones(time.shape) # initial conditions
 
 # human data (Scheurich et al. 2018)
 subjs_data = get_scheurich_etal_2018_data_and_result()
-musicians = subjs_data[0] # group musicians
+#musicians = subjs_data[0] # group musicians
 #musicians = [420]
 
 mean_indiv = np.zeros((len(musicians), 6)) 
