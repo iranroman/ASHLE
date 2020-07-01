@@ -10,7 +10,7 @@ from scipy.stats import linregress
 
 
 # time parameters
-fs = 500
+fs = 1000
 T = 1/fs
 dur = 50
 time = np.arange(0,dur,T)
@@ -42,18 +42,18 @@ for if_s, f_s in enumerate(f_stim):
             bar_results = np.zeros((len(f_stim)))
     
             x = np.exp(1j*2*np.pi*time*f_s)
-            z_m = (0+0.0j)*np.ones(time.shape) # initial conditions
-            f_m = np.ones(time.shape) # initial conditions
-            z_b = (0+0.0j)*np.ones(time.shape) # initial conditions
-            f_b = np.ones(time.shape) # initial conditions
+            z_m = (1+0.0j)*np.ones(time.shape) # initial conditions
+            f_m = f_0*np.ones(time.shape) # initial conditions
+            z_b = (1+0.0j)*np.ones(time.shape) # initial conditions
+            f_b = f_0*np.ones(time.shape) # initial conditions
             for n, t in enumerate(time[:-1]):
                 
-                z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2) + b_2m*np.power(np.abs(z_m[n]),4)/(1 - np.power(np.abs(z_m[n]),2))) + x[n])
-                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (l2/100)*(np.power(base,(f_m[n]-f_b[n])/base)-1))
+                z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2)) + x[n])
+                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (0.001*l1/(f_0))*np.cos(np.angle(z_b[n]))*np.sin(np.angle(z_m[n])))
                 z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
-                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/base)-1))
+                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1))
             
-            locs_z, z_vals = find_peaks(np.real(z_b), height=0.85*np.amax(np.real(z_b[int(nlearn*fs/f_s):])))
+            locs_z, z_vals = find_peaks(np.real(z_b), height=0.8*np.amax(np.real(z_b[int(nlearn*fs/f_s):])))
             locs_x, x_vals = find_peaks(np.real(x))
 
             # which z peak is closest to the midpoint of the simulation?
@@ -91,16 +91,17 @@ for if_s, f_s in enumerate(f_stim):
             #plt.show()
     
     plt.subplot(1,2,if_s+1)
-    plt.imshow(asynch_mat, vmin=-800,vmax=250)
+    plt.imshow(asynch_mat, vmin=-130,vmax=40)
     for il1, l1, in enumerate(l1s):
         for il2, l2, in enumerate(l2s):
             if not np.isnan(asynch_mat[il1,il2]):
                 plt.text(il2, il1, str(int(asynch_mat[il1,il2]))+'ms', ha='center', va='center', weight='bold')
-    plt.yticks(range(len(l1s)),l1s)
-    plt.xticks(range(len(l2s)),l2s)
+    plt.yticks(range(len(l1s)),l1s,fontsize=15)
+    plt.xticks(range(len(l2s)),l2s,fontsize=15)
     ax = plt.gca()
     plt.text(-0.1, 1.1, string.ascii_uppercase[if_s], size=20, transform=ax.transAxes, weight='bold')
-    plt.xlabel(r'$\lambda_2$')
-    plt.ylabel(r'$\lambda_1$')
+    plt.xlabel(r'$\lambda_2$', fontsize=15)
+    if if_s == 0:
+        plt.ylabel(r'$\lambda_1$', fontsize=15)
 
-plt.show()
+plt.savefig('../figures_raw/fig5.eps')

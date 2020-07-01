@@ -15,15 +15,16 @@ dur = 50
 time = np.arange(0,dur,T)
 
 # oscillator parameters
+Fx = 1
 a_m = 1
 b_1m = -1
 b_2m = 0
 a_b = 1
 b_1b = -1
-f_0 = 2.46
+f_0 = 2.5
 f_stim = [1000/(x*(1000/f_0)) for x in [0.55, 0.7, 0.85, 1.15, 1.3, 1.45]]
-l1s = [2, 4, 6, 8] #[0.3, 0.4, 0.5, 0.6]
-l2s = [0, 0.4, 0.8, 1.6] #[0.0, 0.025, 0.05] 
+l1s = [5, 6, 7] 
+l2s = [1, 1.5, 2] 
 base= np.exp(1)
 nlearn = 8
 
@@ -38,16 +39,16 @@ for il1, l1 in enumerate(l1s):
         for if_s, f_s in enumerate(f_stim):
 
             x = np.exp(1j*2*np.pi*time*f_s)
-            z_m = (0+0.0j)*np.ones(time.shape) # initial conditions
-            f_m = np.ones(time.shape) # initial conditions
-            z_b = (0+0.0j)*np.ones(time.shape) # initial conditions
-            f_b = np.ones(time.shape) # initial conditions
+            z_m = (1+0.0j)*np.ones(time.shape) # initial conditions
+            f_m = f_0*np.ones(time.shape) # initial conditions
+            z_b = (1+0.0j)*np.ones(time.shape) # initial conditions
+            f_b = f_0*np.ones(time.shape) # initial conditions
             for n, t in enumerate(time[:-1]):
                 
-                z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2) + b_2m*np.power(np.abs(z_m[n]),4)/(1 - np.power(np.abs(z_m[n]),2))) + x[n])
-                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (l2/10)*(np.power(base,(f_m[n]-f_b[n])/base)-1))
+                z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2)) + Fx*x[n])
+                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(Fx*x[n])*np.sin(np.angle(z_m[n])) - (0.001*l1/(f_0))*np.cos(np.angle(z_b[n]))*np.sin(np.angle(z_m[n])))
                 z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
-                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/base)-1))
+                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1))
         
             locs_z, _ = find_peaks(np.real(z_b))
             locs_x, _ = find_peaks(np.real(x))
@@ -77,21 +78,21 @@ for il1, l1 in enumerate(l1s):
                 bar_results[if_s] = 1000*np.mean((locs_z[0:-2] - locs_x[mid_F_peaks_index:pen_F_peaks_index])/fs) 
 
         ax = plt.subplot(gs[il1, il2])
-        ax.bar(range(len(f_stim)), bar_results)
+        ax.bar(range(len(f_stim)), bar_results,color='black')
         ax.grid(linestyle='dashed')
         ax.set_axisbelow(True)
-        ax.set_ylim([-25, 25])
+        ax.set_ylim([-25, 35])
         if il2 == 0:
-            ax.set_ylabel(r'$\lambda_1 = {}$'.format(l1))
+            ax.set_ylabel(r'$\lambda_1 = {}$'.format(l1),fontsize=13)
             ax.yaxis.set_major_formatter(FormatStrFormatter('%d ms'))
         else:
             ax.set_yticklabels([])
         if il1 == (len(l1s) - 1):
-            ax.set_xlabel(r'$\lambda_2 = {}$'.format(l2))
+            ax.set_xlabel(r'$\lambda_2 = {}$'.format(l2),fontsize=13)
             ax.set_xticks(range(len(f_stim)))
             ax.set_xticklabels(['F50','F30','F15','S15','S30','S50'])
         else:
             ax.set_xticks(range(len(f_stim)))
             ax.set_xticklabels([])
 
-plt.show()
+plt.savefig('../figures_raw/fig6.eps')
