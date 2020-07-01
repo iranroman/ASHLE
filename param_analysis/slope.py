@@ -9,9 +9,9 @@ from scipy.stats import linregress
 
 
 # time parameters
-fs = 500
+fs = 1000
 T = 1/fs
-dur = 100
+dur = 50
 time = np.arange(0,dur,T)
 
 # oscillator parameters
@@ -20,23 +20,24 @@ b_1m = -1
 b_2m = 0
 a_b = 1
 b_1b = -1
-f_0 = 2.28
-f_stim = [1000/(x*(1000/f_0)) for x in [1, 0.58163168, 0.7502137, 1.30107323, 1.8058695]]
-l1s = [6] #[0.3, 0.4, 0.5, 0.6]
-l2s = [2] #[0.0, 0.025, 0.05] 
-bases = [np.exp(1)]
+f_0 = 2.5
+f_stim = [1000/(x*(1000/f_0)) for x in [0.55, 0.70, 0.85, 1.15, 1.3, 1.45]]
+l1s = [5] #[0.3, 0.4, 0.5, 0.6]
+l2s = [1.5] #[0.0, 0.025, 0.05] 
+all_gammas = [0.0005, 0.001, 0.002, 0.004]
+base = [np.exp(1)]
 base_div = 1
 nlearn = 0
 
 numplots = len(l1s)*len(l2s)
-plt.figure(figsize=(10,10))
+plt.figure(figsize=(6,5))
 gs = gridspec.GridSpec(len(l1s), len(l2s), wspace=0, hspace=0)
 
-for base in bases:
+for gamma in all_gammas:
     for il1, l1 in enumerate(l1s):
         for il2, l2 in enumerate(l2s):
     
-            bar_results = np.zeros((len(f_stim)-1))
+            bar_results = np.zeros((len(f_stim)))
             mean_slope = 0
             for if_s, f_s in enumerate(f_stim):
     
@@ -48,7 +49,7 @@ for base in bases:
                 for n, t in enumerate(time[:-1]):
                     
                     z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2) + b_2m*np.power(np.abs(z_m[n]),4)/(1 - np.power(np.abs(z_m[n]),2))) + x[n])
-                    f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (l2/100)*(np.power(base,(f_m[n]-f_b[n])/base)-1))
+                    f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (gamma*l1/((f_0)))*np.cos(np.angle(z_b[n]))*np.sin(np.angle(z_m[n]))) 
                     z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
                     f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/base)-1))
             
@@ -56,31 +57,20 @@ for base in bases:
                 peaks = 1000*peaks/fs # converting to miliseconds
                 peaks = peaks[:128]
                 slope, _, _, _, _ = linregress(range(len(np.diff(peaks))), np.diff(peaks))
-                if f_s == f_0:
-                    mean_slope = slope
-                else:
-                    bar_results[if_s - 1] = slope - mean_slope
+                bar_results[if_s] = slope - mean_slope
 
                 print(np.diff(peaks))
 
             print(l1,l2)
             print(bar_results)
             ax = plt.subplot(gs[il1, il2])
-            ax.bar(range(len(f_stim)-1), bar_results)
-            ax.grid(linestyle='dashed')
-            ax.set_axisbelow(True)
-            #ax.set_ylim([-0.5, 0.5])
-            if il2 == 0:
-                ax.set_ylabel(r'$\lambda_1 = {}$'.format(l1))
-                ax.yaxis.set_major_formatter(FormatStrFormatter('%d ms'))
-            else:
-                ax.set_yticklabels([])
-            if il1 == (len(l1s) - 1):
-                ax.set_xlabel(r'$\lambda_2 = {}$'.format(l2))
-                ax.set_xticks(range(len(f_stim)-1))
-                ax.set_xticklabels(['Faster','Fast','Slow','Slower'])
-            else:
-                ax.set_xticks(range(len(f_stim)-1))
-                ax.set_xticklabels([])
-    
-    plt.show()
+            ax.plot(range(len(f_stim)), bar_results,'-o',linewidth=3,markersize=6,label=r'$\gamma = {}$'.format(gamma))
+
+ax.legend(loc='lower left', prop={'size':11})
+ax.grid(linestyle='dashed')
+ax.set_axisbelow(True)
+ax.set_ylabel('Slope', fontsize=12)
+ax.tick_params(axis="y", labelsize=10)
+ax.set_xticks(range(len(f_stim)))
+ax.set_xticklabels(['F45','F30','F15','S15','S30','S45'],fontsize=10)
+plt.savefig('../figures_raw/fig7.eps')
