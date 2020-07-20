@@ -16,13 +16,15 @@ time = np.arange(0,dur,T)
 a_d = 1
 b_d = -1
 b2_d = 0
-F_d = 1
+F_d = 0
 a = 1
 b = -1
 l1 = 5 # learning rate
 l2 = 1.4 # 0.00019 # elasticity
 l2_d = l2/50 # 0.00019 # elasticity
 base = np.exp(1)
+gsigm = 0
+sigma = 0.00075
 nlearn = 0 # number of metronome learning beats
 z = (1.0+0.0j)*np.ones(time.shape) # initial conditions
 d = (0.99+0.0j)*np.ones(time.shape) # initial conditions
@@ -54,10 +56,12 @@ for subj_data in subjs_data:
         f_d = f0*np.ones(time.shape)
 
         for n, t in enumerate(time[:-1]):
-            d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))))
-            f_d[n+1] = f_d[n] + T*f_d[n]*(-(l1/((spf)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
-            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
-            f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-spf)/spf)-1))
+            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + F_d*x[n] + np.random.normal(0,gsigm,1) + 1j*np.random.normal(0,gsigm,1))
+            f[n+1] = f[n] + T*f[n]*(-l1*np.real(F_d*x[n])*np.sin(np.angle(z[n])) - np.abs(F_d+np.random.normal(0,sigma,1))*l2*(np.power(base,(f[n]-spf)/spf)-1))
+            #d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))))
+            #f_d[n+1] = f_d[n] + T*f_d[n]*(-(l1/((spf)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
+            #z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
+            #f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-spf)/spf)-1))
 
         #plt.subplot(2,1,1)
         #plt.plot(np.real(z[:]))
@@ -142,10 +146,12 @@ for subj_data in subjs_data:
         f_d = f0*np.ones(time.shape)
 
         for n, t in enumerate(time[:-1]):
-            d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))))
-            f_d[n+1] = f_d[n] + T*f_d[n]*(-(l1/((spf)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
-            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
-            f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-spf)/spf)-1))
+            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + F_d*x[n] + np.random.normal(0,gsigm,1) + 1j*np.random.normal(0,gsigm,1))
+            f[n+1] = f[n] + T*f[n]*(-l1*np.real(F_d*x[n])*np.sin(np.angle(z[n])) - np.abs(F_d+np.random.normal(0,sigma,1))*l2*(np.power(base,(f[n]-spf)/spf)-1))
+            #d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2)) + b2_d*np.power(np.abs(d[n]),4)/(1-np.power(np.abs(d[n]),2))))
+            #f_d[n+1] = f_d[n] + T*f_d[n]*(-(l1/((spf)*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
+            #z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
+            #f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-spf)/spf)-1))
 
         #plt.subplot(2,1,1)
         #plt.plot(np.real(z[:]))

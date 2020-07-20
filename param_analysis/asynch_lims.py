@@ -23,6 +23,7 @@ a_b = 1
 b_1b = -1
 f_0 = 2.5
 f_stim = [1000/(0.55*(1000/f_0)), 1000/(1.45*(1000/f_0))] 
+gsigm = 0
 l1s = [0, 2, 4, 8, 16]
 l2s = [0, 2, 4, 8, 16]
 base= np.exp(1)
@@ -47,11 +48,13 @@ for if_s, f_s in enumerate(f_stim):
             z_b = (1+0.0j)*np.ones(time.shape) # initial conditions
             f_b = f_0*np.ones(time.shape) # initial conditions
             for n, t in enumerate(time[:-1]):
-                
-                z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2)) + x[n])
-                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (0.001*l1/(f_0))*np.cos(np.angle(z_b[n]))*np.sin(np.angle(z_m[n])))
-                z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
-                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1))
+
+                z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*(np.power(np.abs(z_b[n]),2))) + x[n] + np.random.normal(0,gsigm,1) + 1j*np.random.normal(0,gsigm,1))
+                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(x[n]))*np.sin(np.angle(z_b[n])) - np.abs(np.abs(x[n])+np.random.normal(0,0.001,1))*l2*(np.power(base,(f_b[n]-f_0)/f_0)-1)) 
+                #z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2)) + x[n])
+                #f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (0.001*l1/(f_0))*np.cos(np.angle(z_b[n]))*np.sin(np.angle(z_m[n])))
+                #z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
+                #f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1))
             
             locs_z, z_vals = find_peaks(np.real(z_b), height=0.8*np.amax(np.real(z_b[int(nlearn*fs/f_s):])))
             locs_x, x_vals = find_peaks(np.real(x))
@@ -81,9 +84,9 @@ for if_s, f_s in enumerate(f_stim):
                 asynch_mat[il1,il2] = 1000*np.mean((locs_z[0:-2] - locs_x[mid_F_peaks_index:pen_F_peaks_index])/fs) 
 
             #plt.figure(figsize=(10,5))
-            #print(asynch_mat[il1,il2],f_s,l1,l2,peaks_diff)
+            print(asynch_mat[il1,il2],f_s,l1,l2,peaks_diff)
             #plt.plot(np.real(z_b[:15000]))
-            #plt.stem(locs_z[locs_z<15000],np.ones((locs_z[locs_z<15000].shape)))
+            #plt.stem(locs_z[locs_z<15000],1.1*np.ones((locs_z[locs_z<15000].shape)))
             #plt.stem(locs_x[locs_x<15000],np.ones((locs_x[locs_x<15000].shape)),'k',markerfmt='ko')
             #plt.plot(np.real(x[:15000]))
             #plt.plot(f_b[:15000])
