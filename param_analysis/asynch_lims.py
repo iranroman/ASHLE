@@ -20,14 +20,13 @@ a_m = 1
 b_1m = -1
 b_2m = 0
 a_b = 1
-b_1b = -1
+b_1b = -100
 f_0 = 2.5
 f_stim = [1000/(0.55*(1000/f_0)), 1000/(1.45*(1000/f_0))] 
 gsigm = 0
-l1s = [0, 2, 4, 8, 16]
-l2s = [0, 2, 4, 8, 16]
+l1s = [0, 2, 4, 8, 16, 32]
+l2s = [0, 2, 4, 8, 16, 32]
 base= np.exp(1)
-nlearn = 4
 
 numplots = len(l1s)*len(l2s)
 plt.figure(figsize=(10,10))
@@ -42,22 +41,23 @@ for if_s, f_s in enumerate(f_stim):
     
             bar_results = np.zeros((len(f_stim)))
     
-            x = np.exp(1j*2*np.pi*time*f_s)
-            z_m = (1+0.0j)*np.ones(time.shape) # initial conditions
+            x = 0.1*np.exp(1j*2*np.pi*time*f_s)
+            z_m = (0+0.0j)*np.ones(time.shape) # initial conditions
             f_m = f_0*np.ones(time.shape) # initial conditions
-            z_b = (1+0.0j)*np.ones(time.shape) # initial conditions
+            z_b = (0+0.0j)*np.ones(time.shape) # initial conditions
             f_b = f_0*np.ones(time.shape) # initial conditions
             for n, t in enumerate(time[:-1]):
 
                 z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*(np.power(np.abs(z_b[n]),2))) + x[n] + np.random.normal(0,gsigm,1) + 1j*np.random.normal(0,gsigm,1))
-                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(x[n]))*np.sin(np.angle(z_b[n])) - np.abs(np.abs(x[n])+np.random.normal(0,0.001,1))*l2*(np.power(base,(f_b[n]-f_0)/f_0)-1)) 
+                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*(np.real(x[n])*np.sin(np.angle(z_b[n])) - np.imag(x[n])*np.cos(np.angle(z_b[n]))) - np.abs(np.abs(x[n])+np.random.normal(0,0.001,1))*l2*(np.power(base,(f_b[n]-f_0)/f_0)-1)) 
                 #z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2)) + x[n])
                 #f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(x[n])*np.sin(np.angle(z_m[n])) - (0.001*l1/(f_0))*np.cos(np.angle(z_b[n]))*np.sin(np.angle(z_m[n])))
                 #z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
                 #f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1))
             
-            locs_z, z_vals = find_peaks(np.real(z_b), height=0.8*np.amax(np.real(z_b[int(nlearn*fs/f_s):])))
+            locs_z, z_vals = find_peaks(np.real(z_b))
             locs_x, x_vals = find_peaks(np.real(x))
+            nlearn = len(locs_x)//2
 
             # which z peak is closest to the midpoint of the simulation?
             halfsamps_locsz_diff = np.absolute(int(nlearn*fs/f_s) - locs_z)
@@ -86,8 +86,8 @@ for if_s, f_s in enumerate(f_stim):
             #plt.figure(figsize=(10,5))
             print(asynch_mat[il1,il2],f_s,l1,l2,peaks_diff)
             #plt.plot(np.real(z_b[:15000]))
-            #plt.stem(locs_z[locs_z<15000],1.1*np.ones((locs_z[locs_z<15000].shape)))
-            #plt.stem(locs_x[locs_x<15000],np.ones((locs_x[locs_x<15000].shape)),'k',markerfmt='ko')
+            #plt.stem(locs_z[locs_z<15000], 0.11*np.ones((locs_z[locs_z<15000].shape)))
+            #plt.stem(locs_x[locs_x<15000], 0.1*np.ones((locs_x[locs_x<15000].shape)),'k',markerfmt='ko')
             #plt.plot(np.real(x[:15000]))
             #plt.plot(f_b[:15000])
             #plt.plot(range(15000),f_s*np.ones(15000))
@@ -98,7 +98,7 @@ for if_s, f_s in enumerate(f_stim):
     for il1, l1, in enumerate(l1s):
         for il2, l2, in enumerate(l2s):
             if not np.isnan(asynch_mat[il1,il2]):
-                plt.text(il2, il1, str(int(asynch_mat[il1,il2]))+'ms', ha='center', va='center', weight='bold')
+                plt.text(il2, il1, str(int(round(asynch_mat[il1,il2])))+'ms', ha='center', va='center', weight='bold')
     plt.yticks(range(len(l1s)),l1s,fontsize=15)
     plt.xticks(range(len(l2s)),l2s,fontsize=15)
     ax = plt.gca()
