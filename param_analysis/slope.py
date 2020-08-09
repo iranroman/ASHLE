@@ -24,7 +24,7 @@ f_0 = 2.5
 f_stim = [1000/(x*(1000/f_0)) for x in [0.55, 0.70, 0.85, 1.15, 1.3, 1.45]]
 l1s = [4] #[0.3, 0.4, 0.5, 0.6]
 l2s = [2] #[0.0, 0.025, 0.05] 
-all_gammas = [0.01, 0.025, 0.05, 0.1]
+all_gammas = [0.01, 0.02, 0.04, 0.08]
 base = [np.exp(1)]
 gsigm = 0
 base_div = 1
@@ -50,10 +50,10 @@ for gamma in all_gammas:
                 for n, t in enumerate(time[:-1]):
 
                     z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2)) + x[n])
-                    f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*(np.real(x[n])*np.sin(np.angle(z_m[n]))-np.imag(x[n])*np.cos(np.angle(z_m[n]))) + gamma*(np.power(base,(f_b[n]-f_m[n])/f_m[n])-1)) 
+                    f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(1j*x[n]*np.conj(z_m[n])/np.abs(z_m[n])) - gamma*(np.power(base,(f_m[n]-f_b[n])/f_b[n])-1))
                     z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
-                    f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*(np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n]))-np.sin(np.angle(z_m[n]))*np.cos(np.angle(z_b[n]))) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1))
-            
+                    f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.real(1j*np.exp(1j*np.angle(z_m[n]))*np.conj(z_b[n])/np.abs(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1))
+
                 peaks, _ = find_peaks(np.real(z_b))
                 peaks = 1000*peaks/fs # converting to miliseconds
                 peaks = peaks[:128]

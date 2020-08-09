@@ -41,17 +41,17 @@ for il1, l1 in enumerate(l1s):
         for if_s, f_s in enumerate(f_stim):
 
             x = np.exp(1j*2*np.pi*time*f_s)
-            z_m = (0+0.0j)*np.ones(time.shape) # initial conditions
+            z_m = (0.01+0.0j)*np.ones(time.shape) # initial conditions
             f_m = f_0*np.ones(time.shape) # initial conditions
-            z_b = (0+0.0j)*np.ones(time.shape) # initial conditions
+            z_b = (0.01+0.0j)*np.ones(time.shape) # initial conditions
             f_b = f_0*np.ones(time.shape) # initial conditions
             for n, t in enumerate(time[:-1]):
 
                 z_m[n+1] = z_m[n] + T*f_m[n]*(z_m[n]*(a_m + 1j*2*np.pi + b_1m*np.power(np.abs(z_m[n]),2)) + x[n])
-                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*(np.real(x[n])*np.sin(np.angle(z_m[n])) - np.imag(x[n])*np.cos(np.angle(z_m[n]))) - gamma*f_b[n])
+                f_m[n+1] = f_m[n] + T*f_m[n]*(-l1*np.real(1j*x[n]*np.conj(z_m[n])/np.abs(z_m[n])) - gamma*(np.power(base,(f_m[n]-f_b[n])/f_b[n])-1))
                 z_b[n+1] = z_b[n] + T*f_b[n]*(z_b[n]*(a_m + 1j*2*np.pi + b_1b*np.power(np.abs(z_b[n]),2)) + np.exp(1j*np.angle(z_m[n])))
-                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*(np.cos(np.angle(z_m[n]))*np.sin(np.angle(z_b[n]))-np.sin(np.angle(z_m[n]))*np.cos(np.angle(z_b[n]))) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1)) 
-        
+                f_b[n+1] = f_b[n] + T*f_b[n]*(-l1*np.real(1j*np.exp(1j*np.angle(z_m[n]))*np.conj(z_b[n])/np.abs(z_b[n])) - l2*(np.power(base,(f_b[n]-f_0)/f_0)-1))
+
             locs_z, _ = find_peaks(np.real(z_b))
             locs_x, _ = find_peaks(np.real(x))
             nlearn = len(locs_x)//2
