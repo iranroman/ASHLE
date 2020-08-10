@@ -14,25 +14,22 @@ time = np.arange(0,dur,T)
 halfsamps = np.floor(len(time)/2);
 
 # oscillator parameters
-a_d = 1
-b_d = -1
-b2_d = 0
-F_d = 0.1
+F_d = 1
 a  = 1
-b  = -100
+b  = -1
 l1 = 4 # learning rate
 l2 = 2 # elasticity
 l2_d = l2/50
 base = np.exp(1)
 gsigm = 0
-sigma = 0.0006
-z  = (0.0+0.0j)*np.ones(time.shape) # initial conditions
-d = (0.0+0.0j)*np.ones(time.shape) # initial conditions
+gamma = 0.02
+z  = (0.01+0.0j)*np.ones(time.shape) # initial conditions
+d = (0.01+0.0j)*np.ones(time.shape) # initial conditions
 
 # human data (Scheurich et al. 2018)
 subjs_data = get_scheurich_etal_2018_data_and_result()
 musicians = subjs_data[0] # group musicians
-#[musicians = [420]
+#musicians = [420]
 
 mean_indiv = np.zeros((len(musicians), 6)) 
 locs_z = pks_z = locs_F = pks_F  = []        # Locations @ local maxima
@@ -54,14 +51,11 @@ for ispr, spr in enumerate(musicians):
         # Forward Euler integration
         for n, t in enumerate(time[:-1]):
             
-            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + F_d*F[n] + np.random.normal(0,gsigm,1) + 1j*np.random.normal(0,gsigm,1))
-            f[n+1] = f[n] + T*f[n]*(-l1*(np.real(F_d*F[n])*np.sin(np.angle(z[n])) - np.imag(F_d*F[n])*np.cos(np.angle(z[n]))) - np.abs(F_d+np.random.normal(0,sigma,1))*l2*(np.power(base,(f[n]-f[0])/f[0])-1))
+            d[n+1] = d[n] + T*f_d[n]*(d[n]*(a + 1j*2*np.pi + b*np.power(np.abs(d[n]),2)) + F_d*F[n])
+            f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(1j*F_d*F[n]*np.conj(d[n])/np.abs(d[n])) - gamma*(np.power(base,(f_d[n]-f[n])/f[n])-1))
+            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*np.power(np.abs(z[n]),2)) + np.exp(1j*np.angle(d[n])))
+            f[n+1] = f[n] + T*f[n]*(-l1*np.real(1j*np.exp(1j*np.angle(d[n]))*np.conj(z[n])/np.abs(z[n])) - l2*(np.power(base,(f[n]-f[0])/f[0])-1))
 
-            #d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2))) + F_d*F[n])
-            #f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*F[n])*np.sin(np.angle(d[n])) - (l1/((f[0])*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
-            #z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
-            #f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-f[0])/f[0])-1))
-            
         # Find peaks a.k.a local maxima - (zero crossing)
         locs_z, _ = find_peaks(np.real(z), prominence=0.1)
         locs_F, _ = find_peaks(np.real(F))
@@ -69,16 +63,16 @@ for ispr, spr in enumerate(musicians):
         np.insert(locs_F, 0, 1)
 
         #plt.subplot(2,1,1)
-        plt.plot(np.real(z[:14000]))
-        plt.plot(np.real(F_d*F[:14000]))
-        plt.plot(1/f[:14000])
-        plt.grid()
+        #plt.plot(np.real(z[:14000]))
+        #plt.plot(np.real(F_d*F[:14000]))
+        #plt.plot(1/f[:14000])
+        #plt.grid()
         #plt.subplot(2,1,2)
         #plt.plot(np.real(d[:14000]))
         #plt.plot(np.real(F[:14000]))
         #plt.plot(1/f_d[:14000])
         #plt.grid()
-        plt.show()
+        #plt.show()
         
         # which z peak is closest to the midpoint of the simulation?
         halfsamps_locsz_diff = np.absolute(halfsamps - locs_z)
@@ -137,6 +131,7 @@ ax2.set_xticklabels(['F45','F30','F15','S15','S30','S45'],fontsize=12)
 ax2.text(-0.1, 1.05, 'B', transform=ax2.transAxes, size=25, weight='bold')
 
 all_sprs = np.linspace(350,650,5)
+#all_sprs = [400]
 mean_indiv = np.zeros((len(all_sprs), 6)) 
 for ispr, spr in enumerate(all_sprs):
     print(spr) 
@@ -155,15 +150,12 @@ for ispr, spr in enumerate(all_sprs):
         
         # Forward Euler integration
         for n, t in enumerate(time[:-1]):
-            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + F_d*F[n] + np.random.normal(0,gsigm,1) + 1j*np.random.normal(0,gsigm,1))
-            f[n+1] = f[n] + T*f[n]*(-l1*(np.real(F_d*F[n])*np.sin(np.angle(z[n])) - np.imag(F_d*F[n])*np.cos(np.angle(z[n]))) - np.abs(F_d+np.random.normal(0,sigma,1))*l2*(np.power(base,(f[n]-f[0])/f[0])-1))
-            #z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + F_d*F[n] + np.random.normal(0,gsigm,1) + 1j*np.random.normal(0,gsigm,1))
-            #f[n+1] = f[n] + T*f[n]*(-l1*np.real(F_d*F[n])*np.sin(np.angle(z[n])) - np.abs(F_d+np.random.normal(0,sigma,1))*l2*(np.power(base,(f[n]-f[0])/f[0])-1))
-            #d[n+1] = d[n] + T*f_d[n]*(d[n]*(a_d + 1j*2*np.pi + b_d*(np.power(np.abs(d[n]),2))) + F_d*F[n])
-            #f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(F_d*F[n])*np.sin(np.angle(d[n])) - (l1/((f[0])*600))*np.cos(np.angle(z[n]))*np.sin(np.angle(d[n])))
-            #z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*(np.power(np.abs(z[n]),2))) + np.exp(1j*np.angle(d[n])))
-            #f[n+1] = f[n] + T*f[n]*(-l1*np.cos(np.angle(d[n]))*np.sin(np.angle(z[n])) - l2*(np.power(base,(f[n]-f[0])/f[0])-1))
-            
+
+            d[n+1] = d[n] + T*f_d[n]*(d[n]*(a + 1j*2*np.pi + b*np.power(np.abs(d[n]),2)) + F_d*F[n])
+            f_d[n+1] = f_d[n] + T*f_d[n]*(-l1*np.real(1j*F_d*F[n]*np.conj(d[n])/np.abs(d[n])) - gamma*(np.power(base,(f_d[n]-f[n])/f[n])-1))
+            z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*np.power(np.abs(z[n]),2)) + np.exp(1j*np.angle(d[n])))
+            f[n+1] = f[n] + T*f[n]*(-l1*np.real(1j*np.exp(1j*np.angle(d[n]))*np.conj(z[n])/np.abs(z[n])) - l2*(np.power(base,(f[n]-f[0])/f[0])-1))
+
         # Find peaks a.k.a local maxima - (zero crossing)
         locs_z, _ = find_peaks(np.real(z), prominence=0.1)
         locs_F, _ = find_peaks(np.real(F))
