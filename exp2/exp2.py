@@ -7,10 +7,10 @@ sys.path.append('..')
 from human_data import get_scheurich_etal_2018_data_and_result 
 
 # time parameters
-fs   = 500
-T    = 1/fs
-dur  = 50
-time = np.arange(0,dur,T)
+fs   = 500 # simulation sampling rate
+T    = 1/fs # simulation period length
+dur  = 50 # seconds
+time = np.arange(0,dur,T) # time samples (s)
 halfsamps = np.floor(len(time)/2);
 
 # oscillator parameters
@@ -61,18 +61,6 @@ for ispr, spr in enumerate(musicians):
         locs_F, _ = find_peaks(np.real(F))
                 
         np.insert(locs_F, 0, 1)
-
-        #plt.subplot(2,1,1)
-        #plt.plot(np.real(z[:14000]))
-        #plt.plot(np.real(F_d*F[:14000]))
-        #plt.plot(1/f[:14000])
-        #plt.grid()
-        #plt.subplot(2,1,2)
-        #plt.plot(np.real(d[:14000]))
-        #plt.plot(np.real(F[:14000]))
-        #plt.plot(1/f_d[:14000])
-        #plt.grid()
-        #plt.show()
         
         # which z peak is closest to the midpoint of the simulation?
         halfsamps_locsz_diff = np.absolute(halfsamps - locs_z)
@@ -161,18 +149,6 @@ for ispr, spr in enumerate(all_sprs):
         locs_F, _ = find_peaks(np.real(F))
                 
         np.insert(locs_F, 0, 1)
-
-        #plt.subplot(2,1,1)
-        #plt.plot(np.real(z[:14000]))
-        #plt.plot(np.real(F[:14000]))
-        #plt.plot(1/f[:14000])
-        #plt.grid()
-        #plt.subplot(2,1,2)
-        #plt.plot(np.real(d[:14000]))
-        #plt.plot(np.real(F[:14000]))
-        #plt.plot(1/f_d[:14000])
-        #plt.grid()
-        #plt.show()
         
         # which z peak is closest to the midpoint of the simulation?
         halfsamps_locsz_diff = np.absolute(halfsamps - locs_z)

@@ -7,10 +7,10 @@ from scipy.stats import linregress
 from human_data import get_zamm_etal_2018_data_and_result
 
 # time parameters
-fs = 500
-T = 1/fs
-dur = 150
-time = np.arange(0,dur,T)
+fs = 500 # simulation sampling rate
+T = 1/fs # simulation period length
+dur = 150 # seconds
+time = np.arange(0,dur,T) # time samples (s)
 
 # oscillator parameters
 F_d = 0
@@ -30,8 +30,6 @@ d = (0.001+0.0j)*np.ones(time.shape) # initial conditions
 zamm_etal_2018 = get_zamm_etal_2018_data_and_result()
 subjs_data = zamm_etal_2018['data']
 subjs_data = subjs_data[:-1]
-#subjs_data = [subjs_data[-1]]
-#subjs_data = [[440, 256, 331, 572, 790]]
 result = zamm_etal_2018['result']
 
 # simulations
@@ -39,7 +37,7 @@ allslopes = []
 for subj_data in subjs_data:
 
     spr = subj_data[0]
-    spf  = 1000/spr
+    spf  = 1000/spr # millisenconds to Hz conversion
 
     mean_slope = 0
     spr_cv = 0
@@ -47,7 +45,7 @@ for subj_data in subjs_data:
     cvs = []
     for pr in subj_data:
 
-        f0 = 1000/pr
+        f0 = 1000/pr # millisenconds to Hz conversion
         x = np.exp(1j*2*np.pi*time*f0)
         x[int(nlearn*fs/f0):] = 0
         f = f0*np.ones(time.shape)
@@ -60,17 +58,6 @@ for subj_data in subjs_data:
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*np.power(np.abs(z[n]),2)) + np.exp(1j*np.angle(d[n])))
             f[n+1] = f[n] + T*f[n]*((-l1*np.real(1j*np.exp(1j*np.angle(d[n]))*np.conj(z[n])/np.abs(z[n]))) - l2*(np.power(base,(f[n]-spf)/spf)-1))
 
-        #plt.subplot(2,1,1)
-        #plt.plot(np.real(z[:]))
-        #plt.plot(np.real(x[:]))
-        #plt.plot(1/f[:])
-        #plt.grid()
-        #plt.subplot(2,1,2)
-        #plt.plot(np.real(d[:]))
-        #plt.plot(np.real(x[:]))
-        #plt.plot(1/f_d[:])
-        #plt.grid()
-        #plt.show()
         print('###############################')
         print('stimulus IOI (Hz): ', 1000/f0)
         print('learned IOI (ms): ', 1000/f[int((nlearn)*fs/f0)])
@@ -120,7 +107,6 @@ ax2.text(-0.1, 1.05, 'B', transform=ax2.transAxes, size=25, weight='bold')
 
 
 subjs_data = np.linspace(350,650,5)
-#subjs_data = [400]
 result = zamm_etal_2018['result']
 
 # simulations
@@ -149,17 +135,17 @@ for subj_data in subjs_data:
             z[n+1] = z[n] + T*f[n]*(z[n]*(a + 1j*2*np.pi + b*np.power(np.abs(z[n]),2)) + np.exp(1j*np.angle(d[n])))
             f[n+1] = f[n] + T*f[n]*(-l1*np.real(1j*np.exp(1j*np.angle(d[n]))*np.conj(z[n])/np.abs(z[n])) - (1/spf)*l2*(np.power(base,(f[n]-spf)/spf)-1))
 
-        #plt.subplot(2,1,1)
-        #plt.plot(np.real(z[:]))
-        #plt.plot(np.real(x[:]))
-        #plt.plot(1/f[:])
-        #plt.grid()
-        #plt.subplot(2,1,2)
-        #plt.plot(np.real(d[:]))
-        #plt.plot(np.real(x[:]))
-        #plt.plot(1/f_d[:])
-        #plt.grid()
-        #plt.show()
+        plt.subplot(2,1,1)
+        plt.plot(np.real(z[:]))
+        plt.plot(np.real(x[:]))
+        plt.plot(1/f[:])
+        plt.grid()
+        plt.subplot(2,1,2)
+        plt.plot(np.real(d[:]))
+        plt.plot(np.real(x[:]))
+        plt.plot(1/f_d[:])
+        plt.grid()
+        plt.show()
         print('###############################')
         print('stimulus IOI (Hz): ', 1000/f0)
         print('learned IOI (ms): ', 1000/f[int((nlearn)*fs/f0)])

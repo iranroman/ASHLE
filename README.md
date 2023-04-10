@@ -20,7 +20,7 @@ source /path/to/ahslenv/bin/activate
 python3 setup.py install
 ```
 
-### Execute experiments from the paper by simply:
+### Execute experiments from the paper:
 ```
 python1 exp<experiment_number>.py
 ```
@@ -30,11 +30,17 @@ where `<experiment_number> = [1, 2, 3]`
 
 Solo music performance with a metronome tempo different than the SMT
 
+Note: generates Figure 3 A,B,C from the article. 
+
 ### Experiment 2 (exp2.py)
 
 Unpaced solo music performance with a starting tempo different than the SMT
 
-### Experiment 3 (exp2.py)
+Note: generates Figure 2 A,B,C from the article. 
+
+### Experiment 3 (exp3.py)
 
 Duet musical performance between musicians with matching or mismatching SMTs
+
+Note: generates Figure 4 A,B,C from the article. 
 
