@@ -24,7 +24,7 @@ b = -100
 l1 = 4 # learning rate
 l2 = 2 # 0.00019 # elasticity
 l2_d = l2/50 # 0.00019 # elasticity
-gsigm = 0.006 #7.5 #15
+gsigm = 0.01 #7.5 #15
 sigma = 0.0006
 base=np.exp(1)
 
@@ -153,6 +153,29 @@ print(np.mean(mean_SPR_match_pairs,0))
 
 ind = np.arange(len(np.mean(mean_SPR_match_pairs, 0))) # x locations for the groups
 width = 0.35  # width of the bars
+
+# # Plot fig5.eps
+# fig = plt.figure()
+# ax = fig.add_subplot(111)
+# ax.bar(ind-width/2, 1000*np.mean(mean_SPR_match_pairs, 0), width, bottom=0,color='grey',edgecolor='black',label='Match')
+# ax.errorbar(ind-width/2, 1000*np.mean(mean_SPR_match_pairs, 0), 1000*np.std(mean_SPR_match_pairs)/np.sqrt(mean_SPR_match_pairs.shape[0]), [0,0,0,0],'none',ecolor='black')
+# ax.bar(ind+width/2, 1000*np.mean(mean_SPR_miss_pairs, 0), width, bottom=0, color='white',edgecolor='black',label='Mismatch')
+# ax.errorbar(ind+width/2, 1000*np.mean(mean_SPR_miss_pairs, 0), 1000*np.std(mean_SPR_miss_pairs)/np.sqrt(mean_SPR_miss_pairs.shape[0]), [0,0,0,0],'none',ecolor='black')
+# ax.set_ylim([0, 35])
+# ax.set_xlim([-0.5, 3.5])
+# ax.set_xticks(np.arange(4))
+# ax.set_xticklabels(['1','2','3','4'],fontsize=15)
+# ax.set_xlabel('Melody repetition',fontsize=15)
+# ax.grid(color='gray', linestyle='dashed')
+# ax.set_axisbelow(True)
+# ax.tick_params(axis="y", labelsize=15)
+# ax.tick_params(axis="x", labelsize=15)
+# ax.yaxis.grid(color='gray', linestyle='dashed')
+# ax.legend(loc='upper right',prop={'size': 13})
+# ax.set_ylabel('Mean absolute asynchrony (ms)',fontsize=15)
+# plt.savefig('../figures_raw/fig5.eps')
+
+# Plot fig4.eps
 fig, (ax1, ax2, ax3) = plt.subplots(1,3,figsize=(15,5))
 ax1.bar(ind-width/2, [17.5, 16.5, 16.3, 17.2], width, bottom=0,color='grey',edgecolor='black',label='Match')
 ax1.errorbar(ind-width/2, [17.5, 16.5, 16.3, 17.2], [0.8, 0.6, 0.7, 1], [0,0,0,0],'none',ecolor='black')

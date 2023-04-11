@@ -48,13 +48,13 @@ Note: generates Figure 4 A,B,C from the article.
 
 | Figure No.  | Script to execute | File name |
 | ------------- | ------------- | ------------- |
-| Figure 2  | `/exp1/exp1.py`  | `/figures_raw/figure2.eps` |
-| Figure 3 | `/exp2/exp2.py`  | `/figures_raw/figure3.eps` |
-| Figure 4 | `/exp3/exp3.py`  | `/figures_raw/figure4.eps` |
-| Figure 5 | `/exp3/exp3.py` | `/figures_raw/figure5.eps` |
-| Figure 6 | `/param_analysis/asynch_lims.py`  | `/figures_raw/figure6.eps` |
-| Figure 7 | `/param_analysis/asynch_detail.py`  | `/figures_raw/figure7.eps` |
-| Figure 8 | `/param_analysis/slope.py`  | `/figures_raw/figure8.eps` |
+| Figure 2  | `/exp1/exp1.py`  | `/figures_raw/figure2(.eps/.png)` |
+| Figure 3 | `/exp2/exp2.py`  | `/figures_raw/figure3(.eps/.png)` |
+| Figure 4 | `/exp3/exp3.py`  | `/figures_raw/figure4(.eps/.png)` |
+| Figure 5 | `/exp3/exp3.py` | `/figures_raw/figure5(.eps/.png)` |
+| Figure 6 | `/param_analysis/asynch_lims.py`  | `/figures_raw/figure6(.eps/.png)` |
+| Figure 7 | `/param_analysis/asynch_detail.py`  | `/figures_raw/figure7(.eps/.png)` |
+| Figure 8 | `/param_analysis/slope.py`  | `/figures_raw/figure8(.eps/.png)` |
 
 
 
