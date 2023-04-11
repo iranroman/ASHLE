@@ -123,4 +123,4 @@ for gamma in all_gammas:
     ax.tick_params(axis="y", labelsize=10)
     ax.set_xticks(range(len(f_stim)))
     ax.set_xticklabels(['F45','F30','F15','S15','S30','S45'],fontsize=10)
-plt.savefig('fig7.eps', format='eps')
+plt.savefig('/figures_raw/fig8.eps', format='eps')
