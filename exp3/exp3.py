@@ -10,7 +10,7 @@ T         = 1/fs
 dur       = 38
 t         = np.linspace(0, dur, dur*fs)
 ntime     = t.size
-halfsamps = np.floor(ntime/2);
+halfsamps = np.floor(ntime/2)
 
 
 # z - parameters
@@ -24,7 +24,7 @@ b = -100
 l1 = 4 # learning rate
 l2 = 2 # 0.00019 # elasticity
 l2_d = l2/50 # 0.00019 # elasticity
-gsigm = 0.07 #7.5 #15
+gsigm = 0.01 #7.5 #15
 sigma = 0.0006
 base=np.exp(1)
 
@@ -33,10 +33,10 @@ dz = 0.0 * np.exp(1j * 2 * pi) * np.ones(t.size)
 y = 0.0 * np.exp(1j * 2 * pi) * np.ones(t.size) # oscillator2
 dy = 0.0 * np.exp(1j * 2 * pi) * np.ones(t.size) 
 
-f_1 = np.zeros(t.shape);  # Adaptive frequency osc1
-f_d1 = np.zeros(t.shape);  # Adaptive frequency osc1
-f_2 = np.zeros(t.shape);  # Adaptive frequency osc2
-f_d2 = np.zeros(t.shape);  # Adaptive frequency osc2
+f_1 = np.zeros(t.shape)  # Adaptive frequency osc1
+f_d1 = np.zeros(t.shape)  # Adaptive frequency osc1
+f_2 = np.zeros(t.shape)  # Adaptive frequency osc2
+f_d2 = np.zeros(t.shape)  # Adaptive frequency osc2
 
 #%%%%%%%%%%%%% Group Mismatch - SPR diff > 110 ms %%%%%%%%%%%%%%%%%%%%%%%%
 freqs_miss1 = np.array([180, 210, 215, 220, 280, 310, 330, 350, 340, 420])
@@ -57,7 +57,7 @@ tr_samps = int(tr_time * fs)  # training samples
 
 # for all frequencies in group miss/match
 for i in range(0, freqs_miss1.size):
-    
+    # millisenconds to Hz conversion
     f_1[0] = 1000/freqs_miss1[i]
     f_d1[0] = 1000/freqs_miss1[i]
     f_2[0] = 1000/freqs_miss2[i] 
@@ -88,12 +88,6 @@ for i in range(0, freqs_miss1.size):
     ypeaks, _ = find_peaks(np.real(y[tr_samps:]), prominence=0.1)
 
     print(f_1_0, f_2_0)
-    #plt.plot(np.real(y))
-    #plt.stem(tr_samps+ypeaks,np.ones(ypeaks.shape))
-    #plt.plot(f_1)
-    #plt.plot(np.real(z))
-    #plt.plot(f_2)
-    #plt.show()
 
     if np.abs(len(zpeaks) - len(ypeaks)) > 2:
         raise ValueError('Different number of peaks between Models')
@@ -109,10 +103,10 @@ print(np.mean(mean_SPR_miss_pairs,0))
 
                   
 
-f_1 = (1000/400)*np.ones(t.shape);  # Adaptive frequency osc1
-f_d1 = (1000/400)*np.ones(t.shape);  # Adaptive frequency osc1
-f_2 = (1000/400)*np.ones(t.shape);  # Adaptive frequency osc2
-f_d2 = (1000/400)*np.ones(t.shape);  # Adaptive frequency osc2
+f_1 = (1000/400)*np.ones(t.shape)  # Adaptive frequency osc1
+f_d1 = (1000/400)*np.ones(t.shape) # Adaptive frequency osc1
+f_2 = (1000/400)*np.ones(t.shape)  # Adaptive frequency osc2
+f_d2 = (1000/400)*np.ones(t.shape) # Adaptive frequency osc2
 
 # for all frequencies in group miss/match
 for i in range(0, freqs_miss1.size):
@@ -124,7 +118,6 @@ for i in range(0, freqs_miss1.size):
     f_1_0 = 1000/freqs_match1[i]
     f_2_0 = 1000/freqs_match2[i] 
         
-    # Forward Euler integration
     # Forward Euler integration
     for n in range(ntime-1):
         if t[n] <= tr_time:
@@ -160,10 +153,33 @@ print(np.mean(mean_SPR_match_pairs,0))
 
 ind = np.arange(len(np.mean(mean_SPR_match_pairs, 0))) # x locations for the groups
 width = 0.35  # width of the bars
+
+# # Plot fig5.eps
+# fig = plt.figure()
+# ax = fig.add_subplot(111)
+# ax.bar(ind-width/2, 1000*np.mean(mean_SPR_match_pairs, 0), width, bottom=0,color='grey',edgecolor='black',label='Match')
+# ax.errorbar(ind-width/2, 1000*np.mean(mean_SPR_match_pairs, 0), 1000*np.std(mean_SPR_match_pairs)/np.sqrt(mean_SPR_match_pairs.shape[0]), [0,0,0,0],'none',ecolor='black')
+# ax.bar(ind+width/2, 1000*np.mean(mean_SPR_miss_pairs, 0), width, bottom=0, color='white',edgecolor='black',label='Mismatch')
+# ax.errorbar(ind+width/2, 1000*np.mean(mean_SPR_miss_pairs, 0), 1000*np.std(mean_SPR_miss_pairs)/np.sqrt(mean_SPR_miss_pairs.shape[0]), [0,0,0,0],'none',ecolor='black')
+# ax.set_ylim([0, 35])
+# ax.set_xlim([-0.5, 3.5])
+# ax.set_xticks(np.arange(4))
+# ax.set_xticklabels(['1','2','3','4'],fontsize=15)
+# ax.set_xlabel('Melody repetition',fontsize=15)
+# ax.grid(color='gray', linestyle='dashed')
+# ax.set_axisbelow(True)
+# ax.tick_params(axis="y", labelsize=15)
+# ax.tick_params(axis="x", labelsize=15)
+# ax.yaxis.grid(color='gray', linestyle='dashed')
+# ax.legend(loc='upper right',prop={'size': 13})
+# ax.set_ylabel('Mean absolute asynchrony (ms)',fontsize=15)
+# plt.savefig('../figures_raw/fig5.eps')
+
+# Plot fig4.eps
 fig, (ax1, ax2, ax3) = plt.subplots(1,3,figsize=(15,5))
 ax1.bar(ind-width/2, [17.5, 16.5, 16.3, 17.2], width, bottom=0,color='grey',edgecolor='black',label='Match')
 ax1.errorbar(ind-width/2, [17.5, 16.5, 16.3, 17.2], [0.8, 0.6, 0.7, 1], [0,0,0,0],'none',ecolor='black')
-ax1.bar(ind+width/2, [24.7, 21.5, 21, 21.9], width, bottom=0, color='white',edgecolor='black',label='Missmatch')
+ax1.bar(ind+width/2, [24.7, 21.5, 21, 21.9], width, bottom=0, color='white',edgecolor='black',label='Mismatch')
 ax1.errorbar(ind+width/2, [24.7, 21.5, 21, 21.9], [2.3, 1.5, 1.5, 1.5], [0,0,0,0],'none',ecolor='black')
 ax1.set_ylim([0, 35])
 ax1.set_xlim([-0.5, 3.5])
@@ -180,7 +196,7 @@ ax1.text(-0.1, 1.05, 'A', transform=ax1.transAxes, size=25, weight='bold')
 ax1.legend(loc='upper right',prop={'size': 13})
 ax2.bar(ind-width/2, 1000*np.mean(mean_SPR_match_pairs, 0), width, bottom=0,color='grey',edgecolor='black',label='Match')
 ax2.errorbar(ind-width/2, 1000*np.mean(mean_SPR_match_pairs, 0), 1000*np.std(mean_SPR_match_pairs)/np.sqrt(mean_SPR_match_pairs.shape[0]), [0,0,0,0],'none',ecolor='black')
-ax2.bar(ind+width/2, 1000*np.mean(mean_SPR_miss_pairs, 0), width, bottom=0, color='white',edgecolor='black',label='Missmatch')
+ax2.bar(ind+width/2, 1000*np.mean(mean_SPR_miss_pairs, 0), width, bottom=0, color='white',edgecolor='black',label='Mismatch')
 ax2.errorbar(ind+width/2, 1000*np.mean(mean_SPR_miss_pairs, 0), 1000*np.std(mean_SPR_miss_pairs)/np.sqrt(mean_SPR_miss_pairs.shape[0]), [0,0,0,0],'none',ecolor='black')
 ax2.set_ylim([0, 35])
 ax2.set_xlim([-0.5, 3.5])
@@ -221,8 +237,6 @@ for ispr, spr in enumerate(all_sprs):
             f_2_0 = 1000/(spr + pair_spr) 
                 
             # Forward Euler integration
-            # Forward Euler integration
-
             for n in range((ntime//2)-1):
                 if t[n] <= tr_time:
 
